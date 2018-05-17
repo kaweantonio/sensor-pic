@@ -62,7 +62,5 @@ DELAY_2:
 	BCF PORTB,7
 
 	GOTO LOOP
-
-	END
-
 	
+	END
