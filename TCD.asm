@@ -5,6 +5,8 @@ CBLOCK 0x20
 	D1
 	D2
 	D3
+	CNT0
+	CNT1
 ENDC
 
 	ORG 0x0000
@@ -20,7 +22,7 @@ INICIO:
 	MOVWF TRISB
 
 	BANKSEL PORTB
-	
+
 	BCF PORTB,7
 	
 	; rotina de delay antes de ligar o sensor (20s)
@@ -43,6 +45,30 @@ DELAY_1:
 	NOP
 
 	BSF PORTB,7
+
+	; configuração do conversor A/D
+	BANKSEL ADCON1
+
+	MOVLW B'10000000'
+	MOVWF ADCON1
+
+	BANKSEL ADCON0
+
+	MOVLW B'11000001'
+	MOVWF ADCON0
+	
+	; salva valores em CNT1 - Alto e CNT0 - Baixo
+	BSF ADCON0, 2
+ESPERA:
+	BTFSC ADCON0, 2
+	GOTO ESPERA
+
+	MOVF ADRESH, w
+	MOVWF CNT1
+	MOVF ADRESL, w
+	MOVWF CNT0
+
+	BANKSEL PORTB
 
 	; rotina depois de ligar o sensor (10s)
 	MOVLW 0x5A ; W = 90
